@@ -12,6 +12,8 @@ int parse_args ( int argc, char * argv[], run_mode_t * rm ) {
   
   strcpy(rm -> ip_addr , DEFAULT_IP);
   rm -> port = DEFAULT_PORT;
+  rm -> max_users = DEFAULT_MAX_USERS;
+  rm -> listn_backlog = DEFULT_LISTN_BACKLOG;
 
   int res;  
   while ( (res = getopt(argc,argv,"s:p:L:")) != -1) {
@@ -29,9 +31,19 @@ int parse_args ( int argc, char * argv[], run_mode_t * rm ) {
 	   return -1;
 	 }      
 	 break;
+
+    case 'u':
+      rm -> max_users = atoi ( optarg );
+      TRACE_MSG ( "max_users: %d\n", rm -> max_users );
+      break;
+
+    case 'b':
+      rm -> listn_backlog = atoi ( optarg );
+      TRACE_MSG ( "listn_backlog: %d\n", rm -> listn_backlog );
+      break;
     
     case 'h':
-      printf ( "reqiers arguments:\n -s: ip-address\n -p: port\n");
+      printf ( "reqiers arguments:\n -s: ip-address\n -p: port\n -u: max users amount\n -b listning baclog size\n");
       return -1;
     
     case 'L' :
