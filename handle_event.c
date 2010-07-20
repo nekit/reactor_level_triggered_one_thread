@@ -36,9 +36,22 @@ void init_sock_desk ( sock_desk_t * ds, int sock, int idx ) {
 
 }
 
+int handle_error ( struct epoll_event * ev, reactor_t * rct ) {
+
+  DEBUG_MSG ( "handling error\n" );
+
+  sock_desk_t * ds = ev -> data.ptr;
+  epoll_ctl ( rct -> epfd, EPOLL_CTL_DEL, ds -> sock, NULL );
+  ds -> sock = -1;
+  push_pqueue ( &rct -> slots_queue, &ds -> idx );
+
+  return 0;
+}
+
+
 int handle_accept_event ( reactor_t * rct ) {
 
-  static int cnt = 0;  
+  static int cnt = 1;  
 
   DEBUG_MSG ( "accepting\n" );
 
@@ -95,6 +108,7 @@ int handle_read_event ( struct epoll_event * ev, reactor_t * rct ) {
   if ( len <= 0 ) {
 
     ERROR_MSG ( "recieve error on sock %d\n", dp -> sock );
+    handle_error ( ev, rct );
     return -1;
   }
 
@@ -134,17 +148,6 @@ int handle_write_event ( struct epoll_event * ev, reactor_t * rct ) {
   return 0;
 }
 
-int handle_error ( struct epoll_event * ev, reactor_t * rct ) {
-
-  DEBUG_MSG ( "handling error\n" );
-
-  sock_desk_t * ds = ev -> data.ptr;
-  epoll_ctl ( rct -> epfd, EPOLL_CTL_DEL, ds -> sock, NULL );
-  ds -> sock = -1;
-  push_pqueue ( &rct -> slots_queue, &ds -> idx );
-
-  return 0;
-}
 
 int handle_event ( struct epoll_event * ev, reactor_t * rct ) {
 

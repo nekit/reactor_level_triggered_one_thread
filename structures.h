@@ -7,10 +7,10 @@
 #define IP_ADDR_SIZE 20
 #define DEFAULT_IP "127.0.0.1"
 #define DEFAULT_PORT 1007
-#define DEFAULT_MAX_USERS 100
+#define DEFAULT_MAX_USERS 2000
 #define DEFULT_LISTN_BACKLOG 50
 #define PACKET_SIZE sizeof ( uint32_t )
-#define EPOLL_TIMEOUT (1000 / 32)
+#define EPOLL_TIMEOUT (100)
 #define NOT_SLEEP_TIMEOUT 0
 #define DATA_QUEUE_SIZE 30
 
