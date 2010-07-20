@@ -10,7 +10,8 @@
 #define DEFAULT_MAX_USERS 100
 #define DEFULT_LISTN_BACKLOG 50
 #define PACKET_SIZE sizeof ( uint32_t )
-#define EPOLL_TIMEOUT 100
+#define EPOLL_TIMEOUT (1000 / 32)
+#define NOT_SLEEP_TIMEOUT 0
 #define DATA_QUEUE_SIZE 30
 
 typedef char packet_t[ PACKET_SIZE ];

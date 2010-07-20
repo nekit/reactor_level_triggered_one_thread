@@ -3,7 +3,7 @@
 
 typedef struct pqueue_s {
 
-  void * exp;
+  int len;
   void * data;
   int head;
   int tail;
@@ -15,7 +15,7 @@ typedef struct pqueue_s {
 /*
   return -1 if error occurs
 */
-int init_pqueue ( pqueue_t * q, void * exp, int size );
+int init_pqueue ( pqueue_t * q, int exp_len, int size );
 
 void push_pqueue ( pqueue_t * q, void * data );
 void pop_pqueue ( pqueue_t * q, void * data );

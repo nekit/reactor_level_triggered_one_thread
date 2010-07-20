@@ -25,7 +25,7 @@ void init_sock_desk ( sock_desk_t * ds, int sock, int idx ) {
 
     TRACE_MSG ( "initing pqueue\n" );
     packet_t tmp;
-    init_pqueue ( &ds -> data_queue, &tmp, DATA_QUEUE_SIZE );
+    init_pqueue ( &ds -> data_queue, sizeof (tmp), DATA_QUEUE_SIZE );
   }else {
 
     pqueue_t * tpq = &ds -> data_queue;
@@ -38,18 +38,18 @@ void init_sock_desk ( sock_desk_t * ds, int sock, int idx ) {
 
 int handle_accept_event ( reactor_t * rct ) {
 
+  static int cnt = 0;  
+
   DEBUG_MSG ( "accepting\n" );
 
   if ( rct -> slots_queue.size == 0 ) {
 
-    WARN_MSG ( "can't accept client\n maximum clients provided\n" );
+    //WARN_MSG ( "can't accept client\n maximum clients provided\n" );
     return -1;
   }
 
   int idx = -1;
   pop_pqueue ( &rct -> slots_queue, &idx );
-
-  DEBUG_MSG ( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!idx : %d\n", idx );
   
   int sock = accept ( rct -> listn_sock, NULL, NULL );
 
@@ -69,7 +69,7 @@ int handle_accept_event ( reactor_t * rct ) {
   ev.data.ptr = &rct -> sd[idx];
   epoll_ctl ( rct -> epfd, EPOLL_CTL_ADD, sock, &ev);
 
-  DEBUG_MSG ( "accepted successfully\n" );
+  INFO_MSG ( "accepted successfully %d\n", cnt++ );
 
   return 0;
 }
@@ -87,7 +87,7 @@ int handle_read_event ( struct epoll_event * ev, reactor_t * rct ) {
 
   if ( dp -> data_queue.size == dp -> data_queue.capacity ) {
 
-    WARN_MSG ( "data queue is full on sock %d\n", dp -> sock );
+    DEBUG_MSG ( "data queue is full on sock %d\n", dp -> sock );
     return 0;
   }
   
@@ -118,7 +118,7 @@ int handle_write_event ( struct epoll_event * ev, reactor_t * rct ) {
 
   if ( 0 == dp -> data_queue.size && sizeof (dp -> send_pack) == dp -> send_ofs ) {
 
-    WARN_MSG ( "nothing to send on sock\n", dp -> sock );
+    // WARN_MSG ( "nothing to send on sock\n", dp -> sock );
     return 0;
   }
 
@@ -139,6 +139,7 @@ int handle_error ( struct epoll_event * ev, reactor_t * rct ) {
   DEBUG_MSG ( "handling error\n" );
 
   sock_desk_t * ds = ev -> data.ptr;
+  epoll_ctl ( rct -> epfd, EPOLL_CTL_DEL, ds -> sock, NULL );
   ds -> sock = -1;
   push_pqueue ( &rct -> slots_queue, &ds -> idx );
 

@@ -46,7 +46,7 @@ int init_reactor ( reactor_t * r, const run_mode_t * rm ) {
   }
 
   int i = 0;
-  if ( -1 == init_pqueue ( &r -> slots_queue, &i, rm -> max_users ) ) {
+  if ( -1 == init_pqueue ( &r -> slots_queue, sizeof(i), rm -> max_users ) ) {
 
     ERROR_MSG ( "initing slots queue problem\n" );
     return -1;
@@ -88,8 +88,8 @@ int run_reactor_ltot ( run_mode_t run_mode ) {
 
   for ( ; ; ) {
 
-    //    TRACE_MSG ( "epoll waiting...\n" );
-    int n = epoll_wait ( reactor.epfd, events, sizeof (events) / sizeof (events[0]), EPOLL_TIMEOUT );
+    TRACE_MSG ( "epoll waiting...\n" );
+    int n = epoll_wait ( reactor.epfd, events, sizeof (events) / sizeof (events[0]), NOT_SLEEP_TIMEOUT );
 
     if ( -1 == n ) {
 
